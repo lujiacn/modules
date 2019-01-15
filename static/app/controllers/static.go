@@ -11,10 +11,11 @@ import (
 	"syscall"
 
 	"fmt"
-	"github.com/revel/revel"
 	"io/ioutil"
 	"net/http"
 	"time"
+
+	"github.com/revel/revel"
 )
 
 // Static file serving controller
@@ -185,7 +186,7 @@ func serve(c Static, prefix, filepath string, allowDir bool) revel.Result {
 	isDir := finfo.Mode().IsDir()
 	// Disallow directory listing
 	if isDir && !allowDir {
-		revel.WARN.Printf("Attempted directory listing of %s", fname)
+		revel.AppLog.Warnf("Attempted directory listing of %s", fname)
 		return c.Forbidden("Directory listing not allowed")
 	}
 
@@ -260,7 +261,7 @@ func (c *Static) processDir(fullPath, basePath string) (args map[string]interfac
 			}
 			fileInfo.Size = fileInfo.Size / divider
 			fileInfo.SizeType = size
-			fileInfo.NiceSize = fmt.Sprintf("%0.1d %s",fileInfo.Size, size)
+			fileInfo.NiceSize = fmt.Sprintf("%0.1d %s", fileInfo.Size, size)
 			fileInfo.Relative = fileInfo.Name
 		}
 		modified := f.ModTime()
