@@ -2,6 +2,7 @@ package gorp
 
 import (
 	"database/sql"
+	"github.com/revel/revel"
 	"github.com/revel/revel/logger"
 	sq "gopkg.in/Masterminds/squirrel.v1"
 	"gopkg.in/gorp.v2"
@@ -24,6 +25,7 @@ type DbInfo struct {
 	DbUser       string
 	DbPassword   string
 	DbName       string
+	DbSchema     string
 	DbConnection string
 	Dialect      gorp.Dialect
 }
@@ -43,6 +45,7 @@ type (
 		SelectOne(i interface{}, builder sq.SelectBuilder) (err error)
 		SelectInt(builder sq.SelectBuilder) (i int64, err error)
 		GetMap() DbGeneric
+		Schema() string
 	}
 	DbWriteable interface {
 		DbReadable
@@ -64,6 +67,13 @@ func (dbGorp *DbGorp) OpenDb() (err error) {
 	// Create the database map
 	dbGorp.Map = &gorp.DbMap{Db: db, Dialect: dbGorp.Info.Dialect}
 
+	revel.OnAppStop(func() {
+		revel.RevelLog.Info("Closing the database (from module)")
+		if err := dbGorp.Close(); err != nil {
+			revel.AppLog.Error("Failed to close the database", "error", err)
+		}
+	})
+
 	return dbGorp.dbInit()
 }
 
@@ -83,7 +93,7 @@ func (dbGorp *DbGorp) Begin() (txn *Transaction, err error) {
 	if err != nil {
 		return
 	}
-	txn = &Transaction{tx, dbGorp.SqlStatementBuilder}
+	txn = &Transaction{tx, dbGorp}
 	return
 }
 
@@ -188,6 +198,12 @@ func (dbGorp *DbGorp) Builder() sq.StatementBuilderType {
 }
 func (dbGorp *DbGorp) GetMap() DbGeneric {
 	return dbGorp.Map
+}
+func (dbGorp *DbGorp) Schema() (result string) {
+	if dbGorp.Info != nil {
+		result = dbGorp.Info.DbSchema
+	}
+	return
 }
 
 type simpleTrace struct {

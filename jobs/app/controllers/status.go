@@ -53,7 +53,7 @@ func (c *Jobs) Status() revel.Result {
 
 		// Compare user and password
 		if user != str[0] || pass != str[1] {
-			revel.AppLog.Warn("Attempted login to /@jobs with invalid credentials")
+			c.Log.Warn("Attempted login to /@jobs with invalid credentials")
 			return c.unauthorized()
 		}
 

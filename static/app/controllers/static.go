@@ -13,23 +13,14 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"time"
 
+	"github.com/revel/modules/static/app/model"
 	"github.com/revel/revel"
 )
 
 // Static file serving controller
 type Static struct {
 	*revel.Controller
-}
-type FileInformation struct {
-	Icon     string
-	Name     string
-	Relative string     // Relative path to current request
-	Size     int64      // The size of the file
-	NiceSize string     // The size of the file
-	SizeType string     // The type of size
-	Modified *time.Time // The last modified date
 }
 
 const (
@@ -186,7 +177,7 @@ func serve(c Static, prefix, filepath string, allowDir bool) revel.Result {
 	isDir := finfo.Mode().IsDir()
 	// Disallow directory listing
 	if isDir && !allowDir {
-		revel.AppLog.Warnf("Attempted directory listing of %s", fname)
+		c.Log.Warn("Attempted directory listing of %s", fname)
 		return c.Forbidden("Directory listing not allowed")
 	}
 
@@ -224,7 +215,7 @@ func (c *Static) processDir(fullPath, basePath string) (args map[string]interfac
 	dirName := fpath.Base(fullPath)
 	args = map[string]interface{}{"dirName": dirName}
 	// Walk the folder showing up and down links
-	dirFiles := []FileInformation{}
+	dirFiles := []model.FileInformation{}
 	symLinkPath, e := fpath.EvalSymlinks(fullPath)
 	if e != nil {
 		return args, e
@@ -237,11 +228,11 @@ func (c *Static) processDir(fullPath, basePath string) (args map[string]interfac
 	}
 
 	if fullPath != basePath {
-		fileInfo := FileInformation{Icon: UP_DIR_ICON, Name: c.Message("static\\parent directory"), Relative: "../"}
+		fileInfo := model.FileInformation{Icon: UP_DIR_ICON, Name: c.Message("static\\parent directory"), Relative: "../"}
 		dirFiles = append(dirFiles, fileInfo)
 	}
 	for _, f := range files {
-		fileInfo := FileInformation{Name: f.Name()}
+		fileInfo := model.FileInformation{Name: f.Name()}
 		if f.IsDir() {
 			fileInfo.Icon = DIR_ICON
 			// Check that it is not a symnlink
