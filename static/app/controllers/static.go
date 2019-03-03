@@ -11,10 +11,11 @@ import (
 	"syscall"
 
 	"fmt"
-	"github.com/revel/modules/static/app/model"
-	"github.com/revel/revel"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/revel/modules/static/app/model"
+	"github.com/revel/revel"
 )
 
 // Static file serving controller
@@ -206,6 +207,9 @@ func serve(c Static, prefix, filepath string, allowDir bool) revel.Result {
 		c.Log.Errorf("Error opening '%s': %s", fname, err)
 		return c.RenderError(err)
 	}
+
+	// add max cache
+	c.Response.Out.Header().Set("Cache-Control", "max-age=31536000")
 	return c.RenderFile(file, revel.Inline)
 }
 
