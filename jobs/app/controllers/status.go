@@ -5,11 +5,12 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
-	"github.com/revel/modules/jobs/app/jobs"
-	"github.com/revel/revel"
-	"github.com/revel/cron"
 	"net/http"
 	"strings"
+
+	"github.com/revel/cron"
+	"github.com/revel/modules/jobs/app/jobs"
+	"github.com/revel/revel"
 )
 
 type Jobs struct {
@@ -52,7 +53,7 @@ func (c *Jobs) Status() revel.Result {
 
 		// Compare user and password
 		if user != str[0] || pass != str[1] {
-			revel.WARN.Println("Attempted login to /@jobs with invalid credentials")
+			revel.AppLog.Warn("Attempted login to /@jobs with invalid credentials")
 			return c.unauthorized()
 		}
 
