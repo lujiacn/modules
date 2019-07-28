@@ -5,11 +5,12 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
+	"net/http"
+	"strings"
+
 	"github.com/revel/cron"
 	"github.com/revel/modules/jobs/app/jobs"
 	"github.com/revel/revel"
-	"net/http"
-	"strings"
 )
 
 type Jobs struct {
