@@ -210,6 +210,7 @@ func serve(c Static, prefix, filepath string, allowDir bool) revel.Result {
 
 	// add max cache
 	c.Response.Out.Header().Set("Cache-Control", "max-age=31536000")
+	revel.AppLog.Debug("Setting cache control")
 	return c.RenderFile(file, revel.Inline)
 }
 
