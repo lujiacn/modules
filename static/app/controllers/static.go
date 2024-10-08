@@ -13,10 +13,6 @@ import (
 	"strings"
 	"syscall"
 
-	"fmt"
-	"io/ioutil"
-	"net/http"
-
 	"github.com/revel/modules/static/app/model"
 	"github.com/revel/revel"
 )
